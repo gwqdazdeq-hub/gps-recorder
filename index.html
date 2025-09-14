@@ -1,238 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPS Position Recorder</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1a202c;
-            color: #e2e8f0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPS Position Recorder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #1a202c;
+      color: #e2e8f0;
+    }
+  </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-    <div class="bg-gray-800 shadow-xl rounded-xl p-8 max-w-lg w-full flex flex-col items-center space-y-6">
-        <h1 class="text-3xl md:text-4xl font-bold text-center text-white mb-2">GPS Position Recorder</h1>
-        <p class="text-gray-400 text-center text-sm md:text-base">
-            This app records your location (latitude, longitude, and altitude) every second after you tap "Start Recording".
-        </p>
+  <div class="bg-gray-800 shadow-xl rounded-xl p-8 max-w-lg w-full flex flex-col items-center space-y-6">
+    <h1 class="text-3xl md:text-4xl font-bold text-center text-white mb-2">GPS Position Recorder</h1>
+    <p class="text-gray-400 text-center text-sm md:text-base">
+      This app records your location (latitude, longitude, and altitude) every second after you tap "Start Recording".
+    </p>
 
-        <div id="status-message" class="text-center p-3 rounded-lg w-full text-sm font-semibold transition-all duration-300">
-            Click 'Start Recording' to begin.
-        </div>
-
-        <div id="current-position-card" class="bg-gray-700 p-4 rounded-lg w-full transition-all duration-300 ease-in-out transform">
-            <h2 class="text-lg font-semibold text-white mb-2">Current Position:</h2>
-            <div class="space-y-1">
-                <p id="latitude" class="text-sm font-mono text-gray-300">Latitude: --</p>
-                <p id="longitude" class="text-sm font-mono text-gray-300">Longitude: --</p>
-                <p id="altitude" class="text-sm font-mono text-gray-300">Altitude: --</p>
-            </div>
-        </div>
-
-        <div class="flex space-x-4 w-full justify-center">
-            <button id="startButton" class="w-full md:w-auto flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
-                Start Recording
-            </button>
-            <button id="stopButton" class="w-full md:w-auto flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50" disabled>
-                Stop Recording
-            </button>
-        </div>
-
-        <div id="recorded-data-container" class="bg-gray-700 p-4 rounded-lg w-full mt-6 max-h-96 overflow-y-auto">
-            <h2 class="text-lg font-semibold text-white mb-2">Recorded Positions:</h2>
-            <ul id="recorded-list" class="space-y-2">
-                <!-- Recorded data will be appended here -->
-            </ul>
-        </div>
-        
-        <div class="w-full mt-4">
-            <button id="downloadButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" disabled>
-                Download KML File
-            </button>
-        </div>
-
-        <!-- Custom message box for errors -->
-        <div id="messageBox" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
-            <div class="bg-gray-800 rounded-lg p-6 shadow-xl text-center max-w-sm w-full">
-                <p id="messageText" class="text-white text-lg font-semibold mb-4"></p>
-                <button onclick="document.getElementById('messageBox').style.display='none'" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">OK</button>
-            </div>
-        </div>
-
+    <div id="status-message" class="text-center p-3 rounded-lg w-full text-sm font-semibold transition-all duration-300">
+      Click 'Start Recording' to begin.
     </div>
 
-    <script>
-        // Log all console messages for debugging
-        console.log("Debugging is active. All logs will be printed here.");
+    <div id="current-position-card" class="bg-gray-700 p-4 rounded-lg w-full transition-all duration-300 ease-in-out transform">
+      <h2 class="text-lg font-semibold text-white mb-2">Current Position:</h2>
+      <div class="space-y-1">
+        <p id="latitude" class="text-sm font-mono text-gray-300">Latitude: --</p>
+        <p id="longitude" class="text-sm font-mono text-gray-300">Longitude: --</p>
+        <p id="altitude" class="text-sm font-mono text-gray-300">Altitude: --</p>
+      </div>
+    </div>
 
-        const startButton = document.getElementById('startButton');
-        const stopButton = document.getElementById('stopButton');
-        const downloadButton = document.getElementById('downloadButton');
-        const statusMessage = document.getElementById('status-message');
-        const latitudeDisplay = document.getElementById('latitude');
-        const longitudeDisplay = document.getElementById('longitude');
-        const altitudeDisplay = document.getElementById('altitude');
-        const recordedList = document.getElementById('recorded-list');
-        const messageBox = document.getElementById('messageBox');
-        const messageText = document.getElementById('messageText');
+    <div class="flex space-x-4 w-full justify-center">
+      <button id="startButton" class="w-full md:w-auto flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+        Start Recording
+      </button>
+      <button id="stopButton" class="w-full md:w-auto flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50" disabled>
+        Stop Recording
+      </button>
+    </div>
 
-        let watchId = null;
-        let recordingInterval = null;
-        const recordedPositions = [];
-        let latestPosition = null;
+    <div id="recorded-data-container" class="bg-gray-700 p-4 rounded-lg w-full mt-6 max-h-96 overflow-y-auto">
+      <h2 class="text-lg font-semibold text-white mb-2">Recorded Positions:</h2>
+      <ul id="recorded-list" class="space-y-2"></ul>
+    </div>
+    
+    <div class="w-full mt-4">
+      <button id="downloadButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" disabled>
+        Download KML File
+      </button>
+    </div>
 
-        function showMessage(message) {
-            messageText.textContent = message;
-            messageBox.style.display = 'flex';
+    <!-- Message box -->
+    <div id="messageBox" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+      <div class="bg-gray-800 rounded-lg p-6 shadow-xl text-center max-w-sm w-full">
+        <p id="messageText" class="text-white text-lg font-semibold mb-4"></p>
+        <button onclick="document.getElementById('messageBox').style.display='none'" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    const downloadButton = document.getElementById('downloadButton');
+    const statusMessage = document.getElementById('status-message');
+    const latitudeDisplay = document.getElementById('latitude');
+    const longitudeDisplay = document.getElementById('longitude');
+    const altitudeDisplay = document.getElementById('altitude');
+    const recordedList = document.getElementById('recorded-list');
+    const messageBox = document.getElementById('messageBox');
+    const messageText = document.getElementById('messageText');
+
+    let watchId = null;
+    let recordingInterval = null;
+    const recordedPositions = [];
+    let latestPosition = null;
+
+    function showMessage(message) {
+      messageText.textContent = message;
+      messageBox.style.display = 'flex';
+    }
+
+    function updateStatus(message, type) {
+      statusMessage.textContent = message;
+      statusMessage.className = 'text-center p-3 rounded-lg w-full text-sm font-semibold transition-all duration-300';
+      if (type === 'success') statusMessage.classList.add('bg-green-600', 'text-white');
+      else if (type === 'error') statusMessage.classList.add('bg-red-600', 'text-white');
+      else if (type === 'info') statusMessage.classList.add('bg-blue-600', 'text-white');
+      else statusMessage.classList.add('bg-gray-700', 'text-gray-300');
+    }
+
+    function handlePosition(position) {
+      latestPosition = position;
+      latitudeDisplay.textContent = `Latitude: ${position.coords.latitude.toFixed(6)}`;
+      longitudeDisplay.textContent = `Longitude: ${position.coords.longitude.toFixed(6)}`;
+      altitudeDisplay.textContent = `Altitude: ${position.coords.altitude !== null ? position.coords.altitude.toFixed(2) + 'm' : 'N/A'}`;
+    }
+
+    function handlePositionError(error) {
+      let errorMessage = '';
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          errorMessage = "Permission denied. Enable location services for your browser.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          errorMessage = "Location unavailable.";
+          break;
+        case error.TIMEOUT:
+          errorMessage = "Location request timed out. Try moving to a clearer area.";
+          break;
+        default:
+          errorMessage = "An unknown error occurred.";
+      }
+      updateStatus(errorMessage, 'error');
+      showMessage(errorMessage);
+    }
+
+    function startRecording() {
+      if (!navigator.geolocation) {
+        showMessage("Geolocation is not supported by your browser.");
+        updateStatus("Geolocation not supported.", 'error');
+        return;
+      }
+
+      updateStatus("Getting location fix...", 'info');
+      navigator.geolocation.getCurrentPosition(
+        (position) => startWatchPosition(position),
+        handlePositionError,
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+      );
+    }
+
+    function startWatchPosition(initialPosition) {
+      handlePosition(initialPosition);
+
+      updateStatus("Recording started...", 'info');
+      watchId = navigator.geolocation.watchPosition(
+        handlePosition,
+        handlePositionError,
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+      );
+
+      recordingInterval = setInterval(() => {
+        if (latestPosition) {
+          const now = new Date();
+          const data = {
+            timestamp: now.toISOString(),
+            latitude: latestPosition.coords.latitude,
+            longitude: latestPosition.coords.longitude,
+            altitude: latestPosition.coords.altitude,
+            accuracy: latestPosition.coords.accuracy
+          };
+          recordedPositions.push(data);
+
+          const listItem = document.createElement('li');
+          listItem.className = 'bg-gray-800 p-3 rounded-lg shadow-inner text-sm';
+          listItem.innerHTML = `
+            <p class="text-gray-200">Time: ${now.toLocaleTimeString()}</p>
+            <p class="text-gray-400 font-mono">Lat: ${data.latitude.toFixed(6)}, Lon: ${data.longitude.toFixed(6)}</p>
+            <p class="text-gray-400 font-mono">Alt: ${data.altitude !== null ? data.altitude.toFixed(2) + 'm' : 'N/A'}</p>
+          `;
+          recordedList.prepend(listItem);
+          if (recordedList.children.length > 20) recordedList.removeChild(recordedList.lastChild);
         }
+      }, 1000);
 
-        function updateStatus(message, type) {
-            statusMessage.textContent = message;
-            statusMessage.className = 'text-center p-3 rounded-lg w-full text-sm font-semibold transition-all duration-300';
-            if (type === 'success') {
-                statusMessage.classList.add('bg-green-600', 'text-white');
-            } else if (type === 'error') {
-                statusMessage.classList.add('bg-red-600', 'text-white');
-            } else if (type === 'info') {
-                statusMessage.classList.add('bg-blue-600', 'text-white');
-            } else {
-                statusMessage.classList.add('bg-gray-700', 'text-gray-300');
-            }
-        }
+      startButton.disabled = true;
+      stopButton.disabled = false;
+      downloadButton.disabled = true;
+      updateStatus("Recording in progress...", 'success');
+    }
 
-        function handlePosition(position) {
-            // Update the latest position
-            latestPosition = position;
-            latitudeDisplay.textContent = `Latitude: ${position.coords.latitude.toFixed(6)}`;
-            longitudeDisplay.textContent = `Longitude: ${position.coords.longitude.toFixed(6)}`;
-            altitudeDisplay.textContent = `Altitude: ${position.coords.altitude !== null ? position.coords.altitude.toFixed(2) + 'm' : 'N/A'}`;
-        }
+    function stopRecording() {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+      if (recordingInterval !== null) {
+        clearInterval(recordingInterval);
+        recordingInterval = null;
+      }
 
-        function handlePositionError(error) {
-            let errorMessage = '';
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    errorMessage = "Permission was denied. Please ensure your device's location services are enabled and you have granted permission to your browser.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    errorMessage = "Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    errorMessage = "The request to get user location timed out. This may be due to a poor GPS signal.";
-                    break;
-                default:
-                    errorMessage = "An unknown error occurred.";
-                    break;
-            }
-            updateStatus(errorMessage, 'error');
-            showMessage(errorMessage);
-        }
+      startButton.disabled = false;
+      stopButton.disabled = true;
+      downloadButton.disabled = recordedPositions.length === 0;
+      updateStatus("Recording stopped.", 'info');
+      showMessage("Recording stopped. You can now download your KML file.");
+    }
 
-        function startRecording() {
-            // Check if Geolocation is supported
-            if (!navigator.geolocation) {
-                showMessage("Geolocation is not supported by your browser.");
-                updateStatus("Geolocation not supported.", 'error');
-                return;
-            }
+    function downloadKML() {
+      if (recordedPositions.length === 0) {
+        showMessage("No data to download.");
+        return;
+      }
 
-            // Start by attempting to get a single position fix
-            updateStatus("Attempting to get a location fix...", 'info');
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    // Success, now start the continuous watch
-                    startWatchPosition(position);
-                },
-                handlePositionError,
-                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-            );
-        }
-
-        function startWatchPosition(initialPosition) {
-            // Set initial position
-            handlePosition(initialPosition);
-
-            // Start watching position changes
-            updateStatus("Starting continuous recording...", 'info');
-            watchId = navigator.geolocation.watchPosition(
-                handlePosition,
-                handlePositionError,
-                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-            );
-
-            // Set up an interval to record the latest position every second
-            recordingInterval = setInterval(() => {
-                if (latestPosition) {
-                    const now = new Date();
-                    const data = {
-                        timestamp: now.toISOString(),
-                        latitude: latestPosition.coords.latitude,
-                        longitude: latestPosition.coords.longitude,
-                        altitude: latestPosition.coords.altitude,
-                        accuracy: latestPosition.coords.accuracy
-                    };
-                    recordedPositions.push(data);
-                    
-                    // Add the new data point to the list
-                    const listItem = document.createElement('li');
-                    listItem.className = 'bg-gray-800 p-3 rounded-lg shadow-inner text-sm';
-                    listItem.innerHTML = `
-                        <p class="text-gray-200">Time: ${now.toLocaleTimeString()}</p>
-                        <p class="text-gray-400 font-mono">Lat: ${data.latitude.toFixed(6)}, Lon: ${data.longitude.toFixed(6)}</p>
-                        <p class="text-gray-400 font-mono">Alt: ${data.altitude !== null ? data.altitude.toFixed(2) + 'm' : 'N/A'}</p>
-                    `;
-                    recordedList.prepend(listItem);
-                    if (recordedList.children.length > 20) {
-                        recordedList.removeChild(recordedList.lastChild);
-                    }
-                }
-            }, 1000);
-
-            // Update UI
-            startButton.disabled = true;
-            stopButton.disabled = false;
-            downloadButton.disabled = true; // Disable download while recording
-            updateStatus("Recording in progress...", 'success');
-        }
-
-        function stopRecording() {
-            // Stop both the position watcher and the recording interval
-            if (watchId !== null) {
-                navigator.geolocation.clearWatch(watchId);
-                watchId = null;
-            }
-            if (recordingInterval !== null) {
-                clearInterval(recordingInterval);
-                recordingInterval = null;
-            }
-
-            // Update UI
-            startButton.disabled = false;
-            stopButton.disabled = true;
-            downloadButton.disabled = recordedPositions.length === 0; // Enable download if data exists
-            updateStatus("Recording stopped.", 'info');
-
-            // Optionally, prompt the user to check the console
-            showMessage("Recording stopped. Your data is ready to be downloaded as a KML file.");
-        }
-
-        function downloadKML() {
-            if (recordedPositions.length === 0) {
-                showMessage("No data to download. Please start recording first.");
-                return;
-            }
-            
-            // Build the KML string
-            let kml = `<?xml version="1.0" encoding="UTF-8"?>
+      let kml = `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
 <Document>
   <name>GPS Recorded Path</name>
   <description>Recorded path with latitude, longitude, and altitude.</description>
+
+  <Style id="pathStyle">
+    <LineStyle>
+      <color>ff0000ff</color>
+      <width>4</width>
+    </LineStyle>
+  </Style>
+
   <Placemark>
     <name>Recorded Path</name>
     <styleUrl>#pathStyle</styleUrl>
@@ -242,48 +220,54 @@
       <altitudeMode>absolute</altitudeMode>
       <coordinates>
 `;
-            
-            // Append coordinates
-            recordedPositions.forEach(pos => {
-                const altitude = pos.altitude !== null ? pos.altitude.toFixed(2) : '0';
-                kml += `${pos.longitude},${pos.latitude},${altitude}\n`;
-            });
-            
-            // Close the KML tags
-            kml += `
-      </coordinates>
+
+      recordedPositions.forEach(pos => {
+        const altitude = pos.altitude !== null ? pos.altitude.toFixed(2) : '0';
+        kml += `${pos.longitude},${pos.latitude},${altitude}\n`;
+      });
+
+      kml += `</coordinates>
     </LineString>
   </Placemark>
-</Document>
+`;
+
+      // optional placemarks for each point
+      recordedPositions.forEach((pos, idx) => {
+        const altitude = pos.altitude !== null ? pos.altitude.toFixed(2) : '0';
+        kml += `
+  <Placemark>
+    <name>Point ${idx + 1}</name>
+    <description>${pos.timestamp}</description>
+    <Point>
+      <coordinates>${pos.longitude},${pos.latitude},${altitude}</coordinates>
+    </Point>
+  </Placemark>
+`;
+      });
+
+      kml += `</Document>
 </kml>`;
 
-            // Create a filename with the current date and time
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            const day = now.getDate().toString().padStart(2, '0');
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const filename = `gps_path_${year}${month}${day}-${hours}${minutes}.kml`;
+      const now = new Date();
+      const filename = `gps_path_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}-${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}.kml`;
 
-            // Create a Blob and a download link
-            const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+      const blob = new Blob([kml], { type: 'application/vnd.google-earth.kml+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
-            showMessage("KML file downloaded successfully!");
-        }
+      showMessage("KML file downloaded successfully!");
+    }
 
-        // Add event listeners to the buttons
-        startButton.addEventListener('click', startRecording);
-        stopButton.addEventListener('click', stopRecording);
-        downloadButton.addEventListener('click', downloadKML);
-    </script>
+    startButton.addEventListener('click', startRecording);
+    stopButton.addEventListener('click', stopRecording);
+    downloadButton.addEventListener('click', downloadKML);
+  </script>
 </body>
 </html>
+
